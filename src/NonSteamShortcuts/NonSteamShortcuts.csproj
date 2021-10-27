@@ -52,6 +52,7 @@
     <Compile Include="Exceptions\NonSteamShortcutsException.cs" />
     <Compile Include="Logic\KeyValue.cs" />
     <Compile Include="Logic\ShortcutUtility.cs" />
+    <Compile Include="Logic\SteamUtility.cs" />
     <Compile Include="Logic\StreamHelpers.cs" />
     <Compile Include="NonSteamShortcuts.cs" />
     <Compile Include="NonSteamShortcutsSettings.cs" />

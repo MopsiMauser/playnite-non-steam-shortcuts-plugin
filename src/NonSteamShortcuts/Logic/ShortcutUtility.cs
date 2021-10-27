@@ -1,6 +1,7 @@
 ﻿using NonSteamShortcuts.DataModels;
 using NonSteamShortcuts.Exceptions;
 using Playnite.SDK;
+using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +13,7 @@ namespace NonSteamShortcuts.Logic
 {
     internal class ShortcutUtility
     {
-        public IList<Shortcut> ReadShortcuts(string filePath)
+        public static IList<Shortcut> ReadShortcuts(string filePath)
         {
             if (!File.Exists(filePath))
             {
@@ -26,7 +27,7 @@ namespace NonSteamShortcuts.Logic
             {
                 if (!shortcutsValues.TryReadAsBinary(fileStream))
                 {
-                    throw new NonSteamShortcutsException(ResourceProvider.GetString("LOCNSSErrorReadingShortcuts"));
+                    throw new NonSteamShortcutsException(string.Format(ResourceProvider.GetString("LOCNSSErrorReadingShortcuts"), filePath));
                 }
                 //iterate list of shortcuts
                 foreach(var shortcutNode in shortcutsValues.Children)
@@ -46,7 +47,7 @@ namespace NonSteamShortcuts.Logic
             return shortcuts;
         }
 
-        public void SaveShortcuts(IList<Shortcut> shortcuts, string filePath)
+        public static void SaveShortcuts(IList<Shortcut> shortcuts, string filePath)
         {
             var shortcutsValues = new KeyValue("shortcuts");
             foreach(var shortcut in shortcuts)
@@ -68,6 +69,17 @@ namespace NonSteamShortcuts.Logic
                 shortcutsValues.Children.Add(shortcutKeyValue);
             }
             shortcutsValues.SaveToFile(filePath, true);
+        }
+
+        public static Shortcut CreateShortcutFromPlayniteGame(Game game, GameAction playAction, ILogger logger, List<string> gamesWithUrl, List<string> gamesSkippedBadEmulator)
+        {
+            var shortcut = new Shortcut();
+            if (playAction.Type == GameActionType.URL)
+            {
+                logger.Warn($"Game {game.Name} has a URL as play action");
+                gamesWithUrl.Add(game.Name);
+            }
+            return shortcut;
         }
     }
 }
