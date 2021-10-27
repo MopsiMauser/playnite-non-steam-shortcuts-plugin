@@ -1,2 +1,2 @@
-# playnite-non-steam-shortcuts-plugin
-This extension will automatically creates Non-Steam shortcuts for the currently selected games in Playnite 9
+# Non-Steam Shortcut Extension for Playnite
+This extension will automatically creates Non-Steam shortcuts for the currently selected games in Playnite 9. Multiple games can be highlighted to create multiple shortcuts at once. The game in Playnite will be modified to launch the game using Steam. This plugin is a C# port from the original project found under https://github.com/bburky/playnite-non-steam-shortcuts
