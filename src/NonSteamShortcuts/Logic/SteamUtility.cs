@@ -1,7 +1,9 @@
-﻿using Microsoft.Win32;
+﻿using Force.Crc32;
+using Microsoft.Win32;
 using NonSteamShortcuts.DataModels;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace NonSteamShortcuts.Logic
 {
@@ -37,7 +39,11 @@ namespace NonSteamShortcuts.Logic
 
         public static string CreateUrlFromShortcut(Shortcut shortcut)
         {
-            return string.Empty;
+            var input = "\"" + shortcut.Exe + "\"" + shortcut.AppName;
+            var crc32 = Crc32Algorithm.Compute(Encoding.UTF8.GetBytes(input));
+            crc32 |= 0x80000000;
+            ulong fullId = ((ulong)crc32 << 32) | 0x02000000UL;
+            return $"steam://rungameid/{fullId}";
         }
     }
 }

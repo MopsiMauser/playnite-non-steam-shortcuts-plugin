@@ -5,6 +5,7 @@ using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
@@ -80,7 +81,7 @@ namespace NonSteamShortcuts
             }
 
             var shortcutFile = Path.Combine(steamUserProfilePath, "config", "shortcuts.vdf");
-            if (!CreateBackup(shortcutFile))
+            if (File.Exists(shortcutFile) && !CreateBackup(shortcutFile))
             {
                 return;
             }
@@ -91,12 +92,17 @@ namespace NonSteamShortcuts
             var gamesSkippedNoAction = new List<string>();
             var gamesSkippedSteamNative = new List<string>();
             var gamesSkippedBadEmulator = new List<string>();
-            var gamesWithUrl = new List<string>();
-            var gamesNotInSteam = new List<string>();
+            var gamesSkippedWithUrl = new List<string>();
+            var gamesSkippedNotInSteam = new List<string>();
+            var gamesSkippedWithScript = new List<string>();
+            var gamesToUpdate = new List<Game>();
             foreach (var game in args.Games)
             {
-                ProcessGame(game, shortcuts, ref gamesUpdated, ref gamesNew, gamesSkippedNoAction,
-                    gamesSkippedSteamNative, gamesSkippedBadEmulator, gamesWithUrl, gamesNotInSteam);
+                if (ProcessGame(game, shortcuts, ref gamesUpdated, ref gamesNew, gamesSkippedNoAction,
+                    gamesSkippedSteamNative, gamesSkippedBadEmulator, gamesSkippedWithUrl, gamesSkippedNotInSteam, gamesSkippedWithScript))
+                {
+                    gamesToUpdate.Add(game);
+                }
             }
             try
             {
@@ -110,44 +116,48 @@ namespace NonSteamShortcuts
                 return;
             }
 
-            gamesSkippedNoAction = CheckListCount(gamesSkippedNoAction);
-            gamesSkippedSteamNative = CheckListCount(gamesSkippedSteamNative);
-            gamesSkippedBadEmulator = CheckListCount(gamesSkippedBadEmulator);
-            gamesWithUrl = CheckListCount(gamesWithUrl);
-            gamesNotInSteam = CheckListCount(gamesNotInSteam);
-
-            var message = new List<string>();
-            var errors = false;
+            var errors = CheckCreationResult(gamesUpdated, gamesNew, gamesSkippedNoAction, gamesSkippedSteamNative, gamesSkippedBadEmulator, gamesSkippedWithUrl,
+                gamesSkippedNotInSteam, gamesSkippedWithScript, out var message);
             if (errors)
             {
-
+                message.Add(ResourceProvider.GetString("LOCNSSQuestionOpenLog"));
+                var result = PlayniteApi.Dialogs.ShowMessage(string.Join("\n", message), ResourceProvider.GetString("LOCNSSUpdatedShortcutsCaption"),
+                    System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Error);
+                if (result == System.Windows.MessageBoxResult.Yes)
+                {
+                    OpenExtensionLog();
+                }
             }
             else
             {
+                PlayniteApi.Database.Games.BeginBufferUpdate();
+                PlayniteApi.Database.Games.Update(gamesToUpdate);
+                PlayniteApi.Database.Games.EndBufferUpdate();
+
                 PlayniteApi.Dialogs.ShowMessage(string.Join("\n", message), ResourceProvider.GetString("LOCNSSUpdatedShortcutsCaption"));
             }
         }
 
-        private void ProcessGame(Game game, IList<Shortcut> availableShortcuts, ref int gamesUpdated, ref int gamesNew,
+        private bool ProcessGame(Game game, IList<Shortcut> availableShortcuts, ref int gamesUpdated, ref int gamesNew,
             List<string> gamesSkippedNoAction, List<string> gamesSkippedSteamNative, List<string> gamesSkippedBadEmulator,
-            List<string> gamesWithUrl, List<string> gamesNotInSteam)
+            List<string> gamesWithUrl, List<string> gamesNotInSteam, List<string> gamesWithScript)
         {
             if (game.PluginId == SteamPluginGuid)
             {
                 _logger.Warn($"Game {game.Name} is already a Steam game");
                 gamesSkippedSteamNative.Add(game.Name);
-                return;
+                return false;
             }
             var playActions = game.GameActions.Where(ga => ga.IsPlayAction);
             if (!playActions.Any())
             {
                 _logger.Warn($"Game {game.Name} has no play action");
                 gamesSkippedNoAction.Add(game.Name);
-                return;
+                return false;
             }
 
             var nonSteamShortcutAction = playActions.FirstOrDefault(pa => pa.Name == NON_STEAM_STEAM_SHORTCUT);
-            playActions.Where(pa => pa != nonSteamShortcutAction).ForEach(pa => pa.IsPlayAction = false);
+            
             if (nonSteamShortcutAction != null)
             {
                 var availableShortcut = availableShortcuts.FirstOrDefault(s => s.AppName == game.Name);
@@ -155,16 +165,20 @@ namespace NonSteamShortcuts
                 {
                     _logger.Error($"Game {game.Name} has a Non-Steam Steam Shortcut game action but it is not listed in Steam's shortcuts file");
                     gamesNotInSteam.Add(game.Name);
-                    return;
+                    return false;
                 }
-                var originalPlayAction = playActions.FirstOrDefault(pa => pa.Name == ORIGINAL_GAME_ACTION_NAME);
+                var originalPlayAction = game.GameActions.FirstOrDefault(pa => pa.Name == ORIGINAL_GAME_ACTION_NAME);
                 if (originalPlayAction == null)
                 {
                     _logger.Error($"Game {game.Name} has a Non-Steam Steam Shortcut game action but the original play action can't be found");
-                    return;
+                    return false;
                 }
-                var shortcutFromOriginalGameAction = ShortcutUtility.CreateShortcutFromPlayniteGame(game, originalPlayAction, _logger,
-                    gamesWithUrl, gamesSkippedBadEmulator);
+                var shortcutFromOriginalGameAction = ShortcutUtility.CreateShortcutFromPlayniteGame(game, originalPlayAction, PlayniteApi, _logger,
+                    gamesWithUrl, gamesSkippedBadEmulator, gamesWithScript);
+                if(shortcutFromOriginalGameAction == null)
+                {
+                    return false;
+                }
                 availableShortcut.AppName = shortcutFromOriginalGameAction.AppName;
                 availableShortcut.LaunchOptions = shortcutFromOriginalGameAction.LaunchOptions;
                 availableShortcut.StartDir = shortcutFromOriginalGameAction.StartDir;
@@ -172,13 +186,19 @@ namespace NonSteamShortcuts
                 availableShortcut.Icon = shortcutFromOriginalGameAction.Icon;
                 nonSteamShortcutAction.IsPlayAction = true;
                 nonSteamShortcutAction.Path = SteamUtility.CreateUrlFromShortcut(availableShortcut);
+                game.GameActions.Where(pa => pa != nonSteamShortcutAction).ForEach(pa => pa.IsPlayAction = false);
                 ++gamesUpdated;
             }
             else
             {
                 var actualPlayAction = playActions.First();
                 actualPlayAction.Name = ORIGINAL_GAME_ACTION_NAME;
-                var newShortcut = ShortcutUtility.CreateShortcutFromPlayniteGame(game, actualPlayAction, _logger, gamesWithUrl, gamesSkippedBadEmulator);
+                var newShortcut = ShortcutUtility.CreateShortcutFromPlayniteGame(game, actualPlayAction, PlayniteApi, _logger, gamesWithUrl,
+                    gamesSkippedBadEmulator, gamesWithScript);
+                if (newShortcut == null)
+                {
+                    return false;
+                }
                 var newPlayAction = new GameAction
                 {
                     Name = NON_STEAM_STEAM_SHORTCUT,
@@ -186,8 +206,73 @@ namespace NonSteamShortcuts
                     Path = SteamUtility.CreateUrlFromShortcut(newShortcut),
                     IsPlayAction = true
                 };
+                playActions.Where(pa => pa != nonSteamShortcutAction).ForEach(pa => pa.IsPlayAction = false);
+                game.GameActions.Insert(0, newPlayAction);
+                availableShortcuts.Add(newShortcut);
                 ++gamesNew;
             }
+            
+            return true;
+        }
+
+        private bool CheckCreationResult(int gamesUpdated, int gamesNew, List<string> gamesSkippedNoAction, List<string> gamesSkippedSteamNative, List<string> gamesSkippedBadEmulator,
+            List<string> gamesSkippedWithUrl, List<string> gamesSkippedNotInSteam, List<string> gamesSkippedWithScript, out List<string> message)
+        {
+            var gamesSkippedNoActionCount = gamesSkippedNoAction.Count;
+            var gamesSkippedSteamNativeCount = gamesSkippedSteamNative.Count;
+            var gamesSkippedBadEmulatorCount = gamesSkippedBadEmulator.Count;
+            var gamesSkippedWithUrlCount = gamesSkippedWithUrl.Count;
+            var gamesSkippedNotInSteamCount = gamesSkippedNotInSteam.Count;
+            var gamesSkippedWithScriptCount = gamesSkippedWithScript.Count;
+            gamesSkippedNoAction = CheckListCount(gamesSkippedNoAction);
+            gamesSkippedSteamNative = CheckListCount(gamesSkippedSteamNative);
+            gamesSkippedBadEmulator = CheckListCount(gamesSkippedBadEmulator);
+            gamesSkippedWithUrl = CheckListCount(gamesSkippedWithUrl);
+            gamesSkippedNotInSteam = CheckListCount(gamesSkippedNotInSteam);
+            gamesSkippedWithScript = CheckListCount(gamesSkippedWithScript);
+
+            message = new List<string>();
+            message.Add(ResourceProvider.GetString("LOCNSSRelaunchSteam"));
+            message.Add(string.Format(ResourceProvider.GetString("LOCNSSUpdatedShortcuts"), gamesUpdated));
+            message.Add(string.Format(ResourceProvider.GetString("LOCNSSCreatedShortcuts"), gamesNew));
+            var errors = false;
+            if (gamesSkippedSteamNative.Count > 0)
+            {
+                message.Add(string.Format(ResourceProvider.GetString("LOCNSSSkippedNativeSteamGames"), gamesSkippedSteamNativeCount));
+                message.AddRange(gamesSkippedSteamNative);
+                errors = true;
+            }
+            if (gamesSkippedNoAction.Count > 0)
+            {
+                message.Add(string.Format(ResourceProvider.GetString("LOCNSSSkippedWithoutPlayAction"), gamesSkippedNoActionCount));
+                message.AddRange(gamesSkippedNoAction);
+                errors = true;
+            }
+            if (gamesSkippedBadEmulator.Count > 0)
+            {
+                message.Add(string.Format(ResourceProvider.GetString("LOCNSSSkippedBadEmulator"), gamesSkippedBadEmulatorCount));
+                message.AddRange(gamesSkippedBadEmulator);
+                errors = true;
+            }
+            if (gamesSkippedWithUrl.Count > 0)
+            {
+                message.Add(string.Format(ResourceProvider.GetString("LOCNSSSkippedURLs"), gamesSkippedWithUrlCount));
+                message.AddRange(gamesSkippedWithUrl);
+                errors = true;
+            }
+            if (gamesSkippedNotInSteam.Count > 0)
+            {
+                message.Add(string.Format(ResourceProvider.GetString("LOCNSSSkippedNotInSteam"), gamesSkippedNotInSteamCount));
+                message.AddRange(gamesSkippedNotInSteam);
+                errors = true;
+            }
+            if (gamesSkippedWithScript.Count > 0)
+            {
+                message.Add(string.Format(ResourceProvider.GetString("LOCNSSSkippedWithScript"), gamesSkippedWithScriptCount));
+                message.AddRange(gamesSkippedWithScript);
+                errors = true;
+            }
+            return errors;
         }
 
         private bool CreateBackup(string shortcutFile)
@@ -229,7 +314,7 @@ namespace NonSteamShortcuts
 
         private List<string> CheckListCount(List<string> list)
         {
-            if(list.Count <= 10)
+            if (list.Count <= 10)
             {
                 return list;
             }
@@ -237,6 +322,24 @@ namespace NonSteamShortcuts
             var newList = list.Take(10).ToList();
             newList.Add("[...]");
             return newList;
+        }
+
+        private void OpenExtensionLog()
+        {
+            var logPath = Path.Combine(PlayniteApi.Paths.ConfigurationPath, "extensions.log");
+            if (!File.Exists(logPath))
+            {
+                PlayniteApi.Dialogs.ShowErrorMessage(string.Format(ResourceProvider.GetString("LOCNSSNoFile"), logPath), ResourceProvider.GetString("LOCNSSErrorCaption"));
+                return;
+            }
+            var startInfo = new ProcessStartInfo
+            {
+                ErrorDialog = true,
+                FileName = logPath,
+                Verb = "open",
+                UseShellExecute = true
+            };
+            Process.Start(startInfo);
         }
     }
 }

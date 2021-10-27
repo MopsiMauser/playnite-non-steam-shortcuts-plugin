@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="LOCNSSSteamUserPath">Please insert the path to your Steam profile userdata folder (including your SteamID, i.e. C:\Program Files (x86)\Steam\userdata\12345678)</sys:String>
-    <sys:String x:Key="LOCNSSSteamUserPathDoesNotExist">The provided path for steam user profile does not exist. Please adjust the path under settings.</sys:String>
+    <sys:String x:Key="LOCNSSSteamUserPathDoesNotExist">The provided path for steam user profile does not exist. Please configure in the settings dialog.</sys:String>
     <sys:String x:Key="LOCNSSCreateShortcut">Create Non-Steam shortcut(s) for selected game(s)</sys:String>
     <sys:String x:Key="LOCNSSErrorCaption">Error</sys:String>
     <sys:String x:Key="LOCNSSErrorCreatingBackup">Error while creating backup</sys:String>
@@ -10,8 +10,31 @@
     <sys:String x:Key="LOCNSSSuccessfullyRestored">Successfully restored shortcuts.vdf backup</sys:String>
     <sys:String x:Key="LOCNSSFailedRestore">Error restoring shortcuts.vdf backup: {0}</sys:String>
     <sys:String x:Key="LOCNSSUpdatedShortcutsCaption">Updated Non-Steam Shortcuts</sys:String>
-    <sys:String x:Key="LOCNSSRelaunchSteam">Please relaunch Steam to update non-Steam shortcuts!
+    <sys:String xml:space="preserve" x:Key="LOCNSSRelaunchSteam">Please relaunch Steam to update Non-Steam shortcuts!
     </sys:String>
-    <sys:String x:Key="LOCNSSUpdatedShortcuts">Updated {0} existing non-Steam shortcuts</sys:String>
-    <sys:String x:Key="LOCNSSCreatedShortcuts">Created {0} new non-Steam shortcuts</sys:String>
+    <sys:String x:Key="LOCNSSUpdatedShortcuts">Updated {0} existing Non-Steam shortcuts</sys:String>
+    <sys:String x:Key="LOCNSSCreatedShortcuts">Created {0} new Non-Steam shortcuts</sys:String>
+    <sys:String xml:space="preserve" x:Key="LOCNSSSkippedNativeSteamGames">
+        Skipped {0} native Steam game(s):
+    </sys:String>
+    <sys:String xml:space="preserve" x:Key="LOCNSSSkippedWithoutPlayAction">
+        Skipped {0} game(s) without any PlayAction set (not installed?):
+    </sys:String>
+    <sys:String xml:space="preserve" x:Key="LOCNSSSkippedBadEmulator">
+        Skipped {0} emulated game(s) with bad emulator profiles:
+    </sys:String>
+    <sys:String xml:space="preserve" x:Key="LOCNSSSkippedURLs">
+        Warning: Some games had URL launch actions (Typically managed by a library plugin). You may wish to update their actions and recreate non-Steam shortcuts. Steam will still launch these games, but the Steam overlay will not function.
+        The following {0} game(s) had URL launch actions:
+    </sys:String>
+    <sys:String xml:space="preserve" x:Key="LOCNSSSkippedNotInSteam">
+        Skipped {0} game(s) which have an associated Non-Steam Shortcut PlayAction but do not exists in Steam:
+    </sys:String>
+    <sys:String xml:space="preserve" x:Key="LOCNSSSkippedWithScript">
+        Skipped {0} game(s) which have an associated Script PlayAction:
+    </sys:String>
+    <sys:String xml:space="preserve" x:Key="LOCNSSQuestionOpenLog">
+        Open extension.log for full list of errors?
+    </sys:String>
+    <sys:String x:Key="LOCNSSNoFile">File {0} does not exist</sys:String>
 </ResourceDictionary>
