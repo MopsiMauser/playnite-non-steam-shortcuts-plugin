@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="LOCNSSSteamUserPath">Please insert the path to your Steam profile userdata folder (including your SteamID)</sys:String>
+    <sys:String x:Key="LOCNSSSteamUserPathDoesNotExist">The provided path does not exist</sys:String>
+    <sys:String x:Key="LOCNSSCreateShortcut">Create Non-Steam shortcut(s) for selected game(s)</sys:String>
+    <sys:String x:Key="LOCNSSErrorCaption">Error</sys:String>
+    <sys:String x:Key="LOCNSSErrorCreatingBackup">Error while creating backup</sys:String>
+    <sys:String x:Key="LOCNSSErrorReadingShortcuts">Error reading available shortcuts from shortcuts.vdf</sys:String>
+</ResourceDictionary>

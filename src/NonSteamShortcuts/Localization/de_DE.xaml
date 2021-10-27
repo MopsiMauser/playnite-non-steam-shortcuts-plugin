@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="LOCNSSSteamUserPath">Bitte geben Sie den Pfad zum Steam-User Profile an (inklusive Steam-ID)</sys:String>
+    <sys:String x:Key="LOCNSSSteamUserPathDoesNotExist">Der angegebene Pfad zum Steam-User Profile existiert nicht</sys:String>
+    <sys:String x:Key="LOCNSSCreateShortcut">Non-Steam Shortcut(s) für selektierte Spiele erstellen</sys:String>
+    <sys:String x:Key="LOCNSSErrorCaption">Fehler</sys:String>
+    <sys:String x:Key="LOCNSSErrorCreatingBackup">Fehler beim Erstellen eines Backups</sys:String>
+    <sys:String x:Key="LOCNSSErrorReadingShortcuts">Fehler beim Lesen der Shortcuts aus shortcuts.vdf</sys:String>
+</ResourceDictionary>
