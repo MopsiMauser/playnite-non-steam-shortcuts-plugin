@@ -60,7 +60,8 @@ namespace NonSteamShortcuts
             var menuItem = new GameMenuItem
             {
                 Action = CreateShortcuts,
-                Description = ResourceProvider.GetString("LOCNSSCreateShortcut")
+                Description = ResourceProvider.GetString("LOCNSSCreateShortcut"),
+                MenuSection = "Non-Steam Shortcuts"
             };
             return Enumerable.Repeat(menuItem, 1);
         }
@@ -148,8 +149,8 @@ namespace NonSteamShortcuts
                 gamesSkippedSteamNative.Add(game.Name);
                 return false;
             }
-            var playActions = game.GameActions.Where(ga => ga.IsPlayAction);
-            if (!playActions.Any())
+            var playActions = game.GameActions?.Where(ga => ga.IsPlayAction);
+            if (playActions == null || !playActions.Any())
             {
                 _logger.Warn($"Game {game.Name} has no play action");
                 gamesSkippedNoAction.Add(game.Name);

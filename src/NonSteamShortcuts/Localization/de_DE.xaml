@@ -15,26 +15,26 @@
     <sys:String x:Key="LOCNSSUpdatedShortcuts">{0} bereits vorhandene Non-Steam Shortcuts aktualisiert</sys:String>
     <sys:String x:Key="LOCNSSCreatedShortcuts">{0} neue(r) Non-Steam Shortcut(s) erstellt</sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedNativeSteamGames">
-        {0} Steam-Spiele übersprungen:
+{0} Steam-Spiele übersprungen:
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedWithoutPlayAction">
-        {0} Spiele übersprungen, da diese keine Aktion besitzen (vllt nicht installiert?):
+{0} Spiele übersprungen, da diese keine Aktion besitzen (vllt nicht installiert oder via Bibliotheksintegration verwaltet?):
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedBadEmulator">
-        {0} Spiele mit Emulator übersprungen, da die jeweiligen Profile ungültig sind:
+{0} Spiele mit Emulator übersprungen, da die jeweiligen Profile ungültig sind:
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedURLs">
-        Achtung: Einige selektierte Spiele haben eine URL als Aktion hinterlegt (Vermutlich verwaltet von einem Plugin). Bitte passen Sie die Aktion möglicherweise an und probieren Sie die Erstellung der Shortcuts erneut. Steam wird diese Spiele mit URL Aktion starten, aber kein Overlay anzeigen.
-        Die folgenden {0} Spiele haben eine URL Aktion:
+Achtung: Einige selektierte Spiele haben eine URL als Aktion hinterlegt (Vermutlich verwaltet von einem Plugin). Bitte passen Sie die Aktion möglicherweise an und probieren Sie die Erstellung der Shortcuts erneut. Steam wird diese Spiele mit URL Aktion starten, aber kein Overlay anzeigen.
+Die folgenden {0} Spiele haben eine URL Aktion:
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedNotInSteam">
-        {0} Spiele übersprungen, da diese bereits eine gültige Aktion haben, aber nicht in Steam existieren:
+{0} Spiele übersprungen, da diese bereits eine gültige Aktion haben, aber nicht in Steam existieren:
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedWithScript">
-        {0} Spiele übersprungen, welche ein Skript als Aktion hinterlegt haben:
+{0} Spiele übersprungen, welche ein Skript als Aktion hinterlegt haben:
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSQuestionOpenLog">
-        Extension.log öffnen, um eine vollständige Fehlerliste anzuzueigen?
+Extension.log öffnen, um eine vollständige Fehlerliste anzuzueigen?
     </sys:String>
     <sys:String x:Key="LOCNSSNoFile">Datei {0} existiert nicht</sys:String>
 </ResourceDictionary>

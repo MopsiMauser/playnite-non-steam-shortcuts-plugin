@@ -46,6 +46,10 @@ namespace NonSteamShortcuts.Logic
 
         public static void SaveShortcuts(IList<Shortcut> shortcuts, string filePath)
         {
+            if(shortcuts.Count == 0)
+            {
+                return;
+            }
             var shortcutsValues = new KeyValue("shortcuts");
             var counter = 0;
             foreach (var shortcut in shortcuts)
