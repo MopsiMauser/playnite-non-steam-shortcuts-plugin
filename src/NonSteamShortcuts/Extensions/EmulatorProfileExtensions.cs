@@ -7,7 +7,10 @@ namespace NonSteamShortcuts.Extensions
         public static CustomEmulatorProfile ExpandVariables(this CustomEmulatorProfile profile, Game game, string emulatorDir, string romPath)
         {
             var gameClone = game.GetClone();
-            gameClone.Roms = new System.Collections.ObjectModel.ObservableCollection<GameRom> { new GameRom("", romPath) };
+            if (!string.IsNullOrWhiteSpace(romPath))
+            {
+                gameClone.Roms = new System.Collections.ObjectModel.ObservableCollection<GameRom> { new GameRom("", romPath) };
+            }
             var profileClone = profile.GetClone();
             profileClone.Arguments = gameClone.StringExpand(profileClone.Arguments, false, emulatorDir);
             profileClone.WorkingDirectory = gameClone.StringExpand(profileClone.WorkingDirectory, true, emulatorDir);

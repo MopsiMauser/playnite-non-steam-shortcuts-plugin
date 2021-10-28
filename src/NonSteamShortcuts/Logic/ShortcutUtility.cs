@@ -58,7 +58,7 @@ namespace NonSteamShortcuts.Logic
                 shortcutKeyValue.Children.Add(new KeyValue("AppName", shortcut.AppName));
                 shortcutKeyValue.Children.Add(new KeyValue("icon", $"\"{shortcut.Icon}\""));
                 shortcutKeyValue.Children.Add(new KeyValue("Exe", $"\"{shortcut.Exe}\""));
-                shortcutKeyValue.Children.Add(new KeyValue("LaunchOptions", shortcut.LaunchOptions));
+                shortcutKeyValue.Children.Add(new KeyValue("LaunchOptions", $"\"{shortcut.LaunchOptions}\""));
                 shortcutKeyValue.Children.Add(new KeyValue("StartDir", $"\"{shortcut.StartDir}\""));
                 shortcutKeyValue.Children.Add(new KeyValue("ShortcutPath", shortcut.ShortcutPath));
                 shortcutKeyValue.Children.Add(new KeyValue("OpenVR", shortcut.OpenVr));
