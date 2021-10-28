@@ -83,7 +83,7 @@ namespace NonSteamShortcuts.Logic
             switch (expandedPlayAction.Type)
             {
                 case GameActionType.Emulator:
-                    shortcut = CreateShortcutFromEmulator(game, expandedPlayAction, playniteAPI, gamesSkippedBadEmulator);
+                    shortcut = CreateShortcutFromEmulator(game, expandedPlayAction, playniteAPI, gamesSkippedBadEmulator, logger);
                     break;
                 case GameActionType.File:
                     shortcut = CreateShortcutFromFile(game, expandedPlayAction);
@@ -113,12 +113,13 @@ namespace NonSteamShortcuts.Logic
             return shortcut;
         }
 
-        private static Shortcut CreateShortcutFromEmulator(Game game, GameAction playAction, IPlayniteAPI playniteAPI, List<string> gamesSkippedBadEmulator)
+        private static Shortcut CreateShortcutFromEmulator(Game game, GameAction playAction, IPlayniteAPI playniteAPI, List<string> gamesSkippedBadEmulator, ILogger logger)
         {
             var emulator = playniteAPI.Database.Emulators.Get(playAction.EmulatorId);
             var profile = emulator.GetProfile(playAction.EmulatorProfileId);
             if (!(profile is CustomEmulatorProfile customEmulatorProfile))
             {
+                logger.Error($"Game {game.Name} has no associated profile or the profile is not a custom one");
                 gamesSkippedBadEmulator.Add(game.Name);
                 return null;
             }

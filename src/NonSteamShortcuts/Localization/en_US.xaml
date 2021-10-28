@@ -21,7 +21,7 @@ Skipped {0} native Steam game(s):
 Skipped {0} game(s) without any PlayAction set (not installed or managed by library integration?):
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedBadEmulator">
-Skipped {0} emulated game(s) with bad emulator profiles:
+Skipped {0} emulated game(s) with bad emulator profiles (custom profiles are needed):
     </sys:String>
     <sys:String xml:space="preserve" x:Key="LOCNSSSkippedURLs">
 Warning: Some games had URL launch actions (Typically managed by a library plugin). You may wish to update their actions and recreate non-Steam shortcuts. Steam will still launch these games, but the Steam overlay will not function.
